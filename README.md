@@ -1,4 +1,4 @@
-# context-intensive-kv-offloading
+# KV Cache Offloading for Context-Intensive Tasks
 [Work in Progress] Supplementary code for "KV Cache Offloading for Context-Intensive Tasks"
 
 🚧Work in progress!🛠️ The evaluation code will be uploaded within the next week (by end of Apr. 16 AOE).

@@ -1,0 +1,127 @@
+from mmengine.config import read_base
+
+
+with read_base():
+    from opencompass.configs.datasets.text2json.text2json import (
+        text2json_datasets,
+    )
+    from opencompass.configs.datasets.needlebench_v2.needlebench_v2_128k.needlebench_v2_multi_retrieval_128k import (
+        needlebench_en_datasets,
+    )
+
+from opencompass.models import HuggingFacewithChatTemplate
+from opencompass.models import LlamaShadowKV, Qwen3ShadowKV
+
+datasets = needlebench_en_datasets + text2json_datasets
+
+models = [
+    dict(
+        type=Qwen3ShadowKV,
+        path='Qwen/Qwen3-30B-A3B-Instruct-2507',   
+        run_cfg={'num_gpus': 1},
+        batch_size=1,
+        sparse_budget=0.015625 * 2,
+        local_budget=64,
+        outlier_budget=0,
+        chunk_size=1,
+        rank=-1,
+        use_higgs_quantization=True,
+        higgs_edenn_d=4,
+        higgs_edenn_n=256,
+        higgs_channel_size=512,
+        abbr='qwen3-30b',
+        keys_higgs=True,
+        keys_higgs_edenn_d=2,
+        keys_higgs_edenn_n=256,
+        keys_higgs_channel_size=512,
+        keys_higgs_hadamard_groupsize=512,
+        values_higgs=True,
+        values_higgs_edenn_d=2,
+        values_higgs_edenn_n=256,
+        values_higgs_channel_size=512,
+        values_higgs_hadamard_groupsize=512,
+        keys_on_device=False,
+        max_length=128 * 1024
+    ),
+        dict(
+        type=Qwen3ShadowKV,
+        path='Qwen/Qwen3-4B-Instruct-2507',   
+        run_cfg={'num_gpus': 1},
+        batch_size=1,
+        sparse_budget=0.015625 * 2,
+        local_budget=64,
+        outlier_budget=0,
+        chunk_size=1,
+        rank=-1,
+        use_higgs_quantization=True,
+        higgs_edenn_d=4,
+        higgs_edenn_n=256,
+        higgs_channel_size=1024,
+        abbr='qwen3-4b',
+        keys_higgs=True,
+        keys_higgs_edenn_d=2,
+        keys_higgs_edenn_n=256,
+        keys_higgs_channel_size=1024,
+        keys_higgs_hadamard_groupsize=1024,
+        values_higgs=True,
+        values_higgs_edenn_d=2,
+        values_higgs_edenn_n=256,
+        values_higgs_channel_size=1024,
+        values_higgs_hadamard_groupsize=1024,
+        max_length=128 * 1024
+    ),
+    dict(
+        type=LlamaShadowKV,
+        path='meta-llama/Llama-3.1-8B-Instruct',   
+        run_cfg={'num_gpus': 1},
+        batch_size=1,
+        sparse_budget=0.015625 * 2,
+        local_budget=64,
+        outlier_budget=0,
+        chunk_size=1,
+        rank=-1,
+        use_higgs_quantization=True,
+        higgs_edenn_d=4,
+        higgs_edenn_n=256,
+        higgs_channel_size=1024,
+        abbr='llama3-8b',
+        keys_higgs=True,
+        keys_higgs_edenn_d=2,
+        keys_higgs_edenn_n=256,
+        keys_higgs_channel_size=1024,
+        keys_higgs_hadamard_groupsize=1024,
+        values_higgs=True,
+        values_higgs_edenn_d=2,
+        values_higgs_edenn_n=256,
+        values_higgs_channel_size=1024,
+        values_higgs_hadamard_groupsize=1024,
+        max_length=128 * 1024
+    ),
+        dict(
+        type=LlamaShadowKV,
+        path='meta-llama/Llama-3.2-3B-Instruct',   
+        run_cfg={'num_gpus': 1},
+        batch_size=1,
+        sparse_budget=0.015625 * 2,
+        local_budget=64,
+        outlier_budget=0,
+        chunk_size=1,
+        rank=-1,
+        use_higgs_quantization=True,
+        higgs_edenn_d=4,
+        higgs_edenn_n=256,
+        higgs_channel_size=1024,
+        abbr='llama3-3b',
+        keys_higgs=True,
+        keys_higgs_edenn_d=2,
+        keys_higgs_edenn_n=256,
+        keys_higgs_channel_size=1024,
+        keys_higgs_hadamard_groupsize=1024,
+        values_higgs=True,
+        values_higgs_edenn_d=2,
+        values_higgs_edenn_n=256,
+        values_higgs_channel_size=1024,
+        values_higgs_hadamard_groupsize=1024,
+        max_length=128 * 1024
+    ),
+    ]

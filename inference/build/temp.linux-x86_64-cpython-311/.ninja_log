@@ -1,0 +1,9 @@
+# ninja log v7
+4	2208	1778065402003909651	/root/home/yegor-yershov/research/yakv-minisgl-neurips-codebase/build/temp.linux-x86_64-cpython-311/python/minisgl/kernel/shadowkv/csrc/metadata_kernels.o	8ede61fcbe6ff84e
+5	18700	1778065402004909651	/root/home/yegor-yershov/research/yakv-minisgl-neurips-codebase/build/temp.linux-x86_64-cpython-311/python/minisgl/kernel/shadowkv/csrc/shadowkv.o	6f2b8253c362b031
+3	19398	1778065402002909651	/root/home/yegor-yershov/research/yakv-minisgl-neurips-codebase/build/temp.linux-x86_64-cpython-311/python/minisgl/kernel/shadowkv/csrc/lib.o	2d112f34033b7422
+1	19988	1778065402000909651	/root/home/yegor-yershov/research/yakv-minisgl-neurips-codebase/build/temp.linux-x86_64-cpython-311/python/minisgl/kernel/higgs/csrc/higgs_quantizer.o	60e2525eb14d7e95
+3	39209	1778065402002909651	/root/home/yegor-yershov/research/yakv-minisgl-neurips-codebase/build/temp.linux-x86_64-cpython-311/python/minisgl/kernel/shadowkv/csrc/gather_kv_cache.o	8f314f6227ad8017
+2	39849	1778065402001909651	/root/home/yegor-yershov/research/yakv-minisgl-neurips-codebase/build/temp.linux-x86_64-cpython-311/python/minisgl/kernel/higgs/csrc/higgs_quantizer_cuda.o	5c1e0afed684c6a7
+0	44357	1778065401999909651	/root/home/yegor-yershov/research/yakv-minisgl-neurips-codebase/build/temp.linux-x86_64-cpython-311/python/minisgl/kernel/higgs/csrc/higgs_dequantization_full.o	42ace0449963ff18
+1	52154	1778065402000909651	/root/home/yegor-yershov/research/yakv-minisgl-neurips-codebase/build/temp.linux-x86_64-cpython-311/python/minisgl/kernel/higgs/csrc/higgs_quantization_cuda.o	2786046d4860881e

@@ -1,0 +1,27 @@
+accelerate
+msgpack
+modelscope
+torch<2.10.0
+transformers<=4.57.3,>=4.56.0
+flashinfer-python>=0.5.3
+pyzmq
+uvicorn
+fastapi
+prompt_toolkit
+openai
+apache-tvm-ffi>=0.1.4
+sgl_kernel>=0.3.17.post1
+quack-kernels
+tqdm
+fast-hadamard-transform@ git+https://github.com/Dao-AILab/fast-hadamard-transform.git
+
+[dev]
+pytest>=6.0
+pytest-cov>=2.0
+black>=22.0
+flake8>=4.0
+mypy>=0.950
+pre-commit>=3.0.0
+ruff>=0.11.0
+matplotlib>=3.10.5
+pyarrow

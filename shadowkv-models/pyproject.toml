@@ -1,0 +1,15 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "shadowkv-models"
+version = "0.1.0"
+requires-python = ">=3.8"
+
+[tool.setuptools]
+packages = ["shadowkv_models", "shadowkv_models.quantization"]
+
+[tool.setuptools.package-data]
+kernels = ["*.so"]
+"shadowkv_models.quantization" = ["higgs_grids/*.pt"]

@@ -8,11 +8,14 @@ with read_base():
     from opencompass.configs.datasets.needlebench_v2.needlebench_v2_128k.needlebench_v2_multi_retrieval_128k import (
         needlebench_en_datasets,
     )
+    from opencompass.configs.datasets.longproc import (
+        longproc_datasets,
+    )
 
 from opencompass.models import HuggingFacewithChatTemplate
 from opencompass.models import LlamaShadowKV, Qwen3ShadowKV
 
-datasets = needlebench_en_datasets + text2json_datasets
+datasets = needlebench_en_datasets + text2json_datasets + longproc_datasets
 
 models = [
     dict(

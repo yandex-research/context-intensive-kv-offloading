@@ -13,7 +13,11 @@ To run the experiments, you first need to build a docker container with our envi
 
 Run the image with:
 
-`docker run -it --gpus all --volume /path/to_your_downloaded_models:/mnt/LLM eval_image`
+`docker run -it -d --gpus all --volume /path/to_your_downloaded_models:/mnt/LLM eval_image`
+
+And then exec into container via:
+
+`docker exec -it container_id bash`
 
 Note: if you wish to forego mounting downloaded models and download them on the go, remove the `volume` flag and unset `HF_HOME` variable inside the container.
 
@@ -21,9 +25,9 @@ Inside the image, run `opencompass run_cfg.py` with appropriate `CUDA_VISIBLE_DE
 
 To run the validation with YAKV on MultiNeedle, Text2JSON and LongProc datasets and Qwen3-30B-A3B-Instruct-2507, Qwen3-4B-Instruct-2507, Llama-3.1-8B-Instruct and Llama-3.2-3B-Instruct run
 ```
-PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True CUDA_VISIBLE_DEVICES=0 opencompass -w outputs run_cfg.py
+CUDA_VISIBLE_DEVICES=0 opencompass -w outputs run_cfg.py
 ```
-from `/workspace/`. If you wish to use some subset of models or dataset, modify the [run_cfp.py](https://github.com/yandex-research/context-intensive-kv-offloading/blob/main/run_cfg.py) accordingly. You can change sparse budget, chunk size, HIGGS grid, etc by changing corresponding values from the same `run_cfg.py`
+from `/workspace/`. If you wish to use some subset of models or dataset, modify the [run_cfg.py](https://github.com/yandex-research/context-intensive-kv-offloading/blob/main/run_cfg.py) accordingly. You can change sparse budget, chunk size, HIGGS grid, etc by changing corresponding values from the same `run_cfg.py`
 
 # GPU Inference
 

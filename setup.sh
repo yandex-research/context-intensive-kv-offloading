@@ -25,3 +25,5 @@ MAX_JOBS=16 pip install --no-build-isolation -e ./shadowkv-models
 git clone https://github.com/Dao-AILab/fast-hadamard-transform.git fast-hadamard-transform
 cd fast-hadamard-transform
 MAX_JOBS=16 pip install --no-build-isolation .
+
+ln -sfn /workspace/shadowkv-opencompass/opencompass /venv/lib/python3.10/site-packages/opencompass

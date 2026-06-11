@@ -16,13 +16,11 @@ echo 'export PATH="/venv/bin:$PATH"' > ~/.bashrc
 pip install -U pip setuptools
 pip install wheel torch==2.7 transformers==4.52.4 pyarrow==23 flashinfer-python torchvision==0.22 vllm==0.9 pandas==2.3.3
 
-pip install ./shadowkv-opencompass
+pip install -e ./shadowkv-opencompass
 
 mkdir shadowkv-models/3rdparty
 git clone https://github.com/NVIDIA/cutlass.git ./shadowkv-models/3rdparty/cutlass
-MAX_JOBS=16 pip install --no-build-isolation ./shadowkv-models
-
-rm -rf ./shadowkv-opencompass ./shadowkv-models
+MAX_JOBS=16 pip install --no-build-isolation -e ./shadowkv-models
 
 git clone https://github.com/Dao-AILab/fast-hadamard-transform.git fast-hadamard-transform
 cd fast-hadamard-transform

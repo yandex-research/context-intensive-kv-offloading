@@ -56,9 +56,10 @@ To do this, follow the installation steps below.
 ### ArkVale 
 
 Git repo that will be cloned is a fork of official repo. The fork is different in 3 things:
-* it supports newer version of transformers (so you must install transformers==5.6.1)
-* it does not offload generated tokens to have a more fair comparison with ShadowKV and YAKV (upper bound of ArkVale is being evaluated)
-* it supports additional group_size (from GQA) values, so we could do the evaluation on models like Llama-3.2-3B with group_size=3
+* It supports newer version of transformers (so you must install transformers==5.6.1)
+* It supports a dynamic token budget: the budget is a percentage of the prompt length, not a fixed number of tokens.
+* It does not offload generated tokens to have a more fair comparison with ShadowKV and YAKV (upper bound of ArkVale is being evaluated)
+* It supports additional group_size (from GQA) values, so we could do the evaluation on models like Llama-3.2-3B with group_size=3
 
 #### Setup
 ```
@@ -82,6 +83,8 @@ Just like with YAKV, you can controll what models and datasets are used from `ru
 In case of LRQK you can use both transformers==4.52.4 and transformers==5.6.1. LRQK is a more memory demanding baseline, so on A100, while using Qwen3-30B-A3B you will encounter OOM even on text2json (66k tokens max). To handle Qwen3-30B-A3B evaluation in memory constrained regime (80Gb of GPU RAM), we recommend using transformers==4.52.4 and optionally `cache_on_device=True` (relevant in case of multineedle -- 128k tokens on 80Gb GPU). 
 
 For more memory demanding setup (Qwen3-30B-A3B on 80Gb GPU) use `qwen_30B_long_context` branch, otherwise you can use `transformers_v5`.
+
+Just like with ArkVale, you are going to clone a fork of the official repo, this fork supports dynamic token budget and fixes randomness for reproducibility.
 
 #### Setup
 ```

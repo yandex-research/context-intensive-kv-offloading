@@ -7,6 +7,8 @@ The Text2JSON dataset gathered and used in the experiments is available as [`./t
 
 # Evaluation
 
+## Transformers==4.52.4
+
 To run the experiments, you first need to build a docker container with our environment:
 
 `docker build -t eval_image .`
@@ -28,6 +30,48 @@ To run the validation with YAKV on MultiNeedle, Text2JSON and LongProc datasets 
 CUDA_VISIBLE_DEVICES=0 opencompass -w outputs run_cfg.py
 ```
 from `/workspace/`. If you wish to use some subset of models or dataset, modify the [run_cfg.py](https://github.com/yandex-research/context-intensive-kv-offloading/blob/main/run_cfg.py) accordingly. You can change sparse budget, chunk size, HIGGS grid, etc by changing corresponding values from the same `run_cfg.py`
+
+## Transformers==5.6.1
+
+You can also use a newer transformers version. The setup is the same, just use Dockerfile_v5 instead of Dockerfile:
+
+`docker build -t eval_image -f Dockerfile_v5 .`
+
+Then do `docker run` and `docker exec` just like commands above.
+
+## Baselines
+
+You can evaluate different baselines, like as ArkVale and LRQK too.
+
+To do this, follow the installation steps below.
+
+### ArkVale 
+
+Git repo that will be cloned is a fork of official repo. The fork is different in 3 things:
+* it supports newer version of transformers (so you must install transformers==5.6.1)
+* it does not offload generated tokens to have a more fair comparison with ShadowKV and YAKV (upper bound of ArkVale is being evaluated)
+* it supports additional group_size (from GQA) values, so we could do the evaluation on models like Llama-3.2-3B with group_size=3
+
+#### Setup
+```
+mkdir baselines
+git clone -b GQA_3_fix https://github.com/AndreyBocharnikov/ArkVale.git baselines/ArkVale
+cd baselines/ArkVale
+git submodule update --init --recursive --depth 1
+cd source
+TORCH_CUDA_ARCH_LIST="8.0" uv pip install --no-build-isolation -e .
+cd ..
+```
+Change `TORCH_CUDA_ARCH_LIST` according to the GPU you are using, `TORCH_CUDA_ARCH_LIST="8.0"` is for A100.
+
+#### Launch
+Just like with YAKV, you can controll what models and datasets are used from `run_config.py` file. 
+
+`python opencompass_run.py run_config.py -w outputs`
+
+### LRQK
+
+TODO
 
 # GPU Inference
 

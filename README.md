@@ -39,6 +39,12 @@ You can also use a newer transformers version. The setup is the same, just use D
 
 Then do `docker run` and `docker exec` just like commands above.
 
+Newer version allows you to use:
+
+* newer models such as Qwen3.5
+* newer benchmarks such as LongBench_v2
+* faster MoE kerenls (relevant in case of Qwen3-30B-A3B-Instruct-2507). But be cautious, faster kernels takes more memory so you are more likely to encounter OOM.
+
 ## Baselines
 
 You can evaluate different baselines, like as ArkVale and LRQK too.
@@ -71,7 +77,23 @@ Just like with YAKV, you can controll what models and datasets are used from `ru
 
 ### LRQK
 
-TODO
+In case of LRQK you can use both transformers==4.52.4 and transformers==5.6.1. LRQK is a more memory demanding baseline, so on A100, while using Qwen3-30B-A3B you will encounter OOM even on text2json (66k tokens max). To handle Qwen3-30B-A3B evaluation in memory constrained regime (80Gb of GPU RAM), we recommend using transformers==4.52.4 and optionally `cache_on_device=True` (relevant in case of multineedle -- 128k tokens on 80Gb GPU). 
+
+For more memory demanding setup (Qwen3-30B-A3B on 80Gb GPU) use `qwen_30B_long_context` branch, otherwise you can use `transformers_v5`.
+
+#### Setup
+```
+mkdir -p baselines
+git clone -b branch_name https://github.com/AndreyBocharnikov/LRQK.git baselines/LRQK
+cd baselines/LRQK
+cd cpp_kernel
+make
+cd ..
+```
+#### Launch
+To start the evaluation run this from LRQK folder:
+
+`python ./opencompass_run.py run_config.py`
 
 # GPU Inference
 

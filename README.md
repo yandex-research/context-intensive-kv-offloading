@@ -65,7 +65,7 @@ cd ..
 Change `TORCH_CUDA_ARCH_LIST` according to the GPU you are using, `TORCH_CUDA_ARCH_LIST="8.0"` is for A100.
 
 #### Launch
-Just like with YAKV, you can controll what models and datasets are used from `run_config.py` file. 
+Just like with YAKV, you can controll what models and datasets are used from `run_config.py` file from ArkVale folder. To start the evaluation run this from ArkVale folder:
 
 `python opencompass_run.py run_config.py -w outputs`
 

@@ -45,6 +45,8 @@ Newer version allows you to use:
 * newer benchmarks such as LongBench_v2
 * faster MoE kerenls (relevant in case of Qwen3-30B-A3B-Instruct-2507). But be cautious, faster kernels takes more memory so you are more likely to encounter OOM.
 
+If you encounter OOM with Qwen3-30-A3B on multineedle, you can use `keys_on_device=False`, which is gonna make validation slower, but less memory demanding.
+
 ## Baselines
 
 You can evaluate different baselines, like as ArkVale and LRQK too.

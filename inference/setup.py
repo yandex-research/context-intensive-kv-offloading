@@ -4,6 +4,8 @@ from setuptools import setup
 from torch.utils.cpp_extension import BuildExtension, CUDAExtension
 
 COMPUTE_CAP = os.environ.get('COMPUTE_CAP', '90')
+if int(COMPUTE_CAP) >= 90:
+    COMPUTE_CAP += 'a'
 
 setup(
     ext_modules=[
@@ -15,6 +17,9 @@ setup(
                 "python/minisgl/kernel/higgs/csrc/higgs_quantizer_cuda.cu",
                 "python/minisgl/kernel/higgs/csrc/higgs_quantization_cuda.cu",
                 "python/minisgl/kernel/higgs/csrc/higgs_dequantization_full.cu",
+                "python/minisgl/kernel/higgs/csrc/higgs_score.cu",
+                "python/minisgl/kernel/higgs/csrc/higgs_quantize_heads.cu",
+                "python/minisgl/kernel/higgs/csrc/higgs_dequantize_heads.cu",
                 "python/minisgl/kernel/shadowkv/csrc/gather_kv_cache.cu",
                 "python/minisgl/kernel/shadowkv/csrc/metadata_kernels.cu",
                 "python/minisgl/kernel/shadowkv/csrc/shadowkv.cpp",

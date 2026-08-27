@@ -21,7 +21,9 @@ Requires-Dist: msgpack
 Requires-Dist: modelscope
 Requires-Dist: torch<2.10.0
 Requires-Dist: transformers<=4.57.3,>=4.56.0
-Requires-Dist: flashinfer-python>=0.5.3
+Requires-Dist: flashinfer-python @ https://github.com/flashinfer-ai/flashinfer/releases/download/nightly-v0.6.18-20260818/flashinfer_python-0.6.18.dev20260818-py3-none-any.whl
+Requires-Dist: flashinfer-cubin @ https://github.com/flashinfer-ai/flashinfer/releases/download/nightly-v0.6.18-20260818/flashinfer_cubin-0.6.18.dev20260818-py3-none-any.whl
+Requires-Dist: flashinfer-jit-cache @ https://github.com/flashinfer-ai/flashinfer/releases/download/nightly-v0.6.18-20260818/flashinfer_jit_cache-0.6.18.dev20260818+cu128-cp39-abi3-manylinux_2_28_x86_64.whl
 Requires-Dist: pyzmq
 Requires-Dist: uvicorn
 Requires-Dist: fastapi
@@ -31,7 +33,6 @@ Requires-Dist: apache-tvm-ffi>=0.1.4
 Requires-Dist: sgl_kernel>=0.3.17.post1
 Requires-Dist: quack-kernels
 Requires-Dist: tqdm
-Requires-Dist: fast-hadamard-transform@ git+https://github.com/Dao-AILab/fast-hadamard-transform.git
 Provides-Extra: dev
 Requires-Dist: pytest>=6.0; extra == "dev"
 Requires-Dist: pytest-cov>=2.0; extra == "dev"
@@ -71,17 +72,20 @@ Also all prerequisites from mini-sglang are required, such as **NVIDIA CUDA Tool
 ### Example:
 ```bash
 python3 -m minisgl \
-    --model-path Qwen3-8B \
+    --model-path Qwen3-30B-A3B-Instruct-2507 \
     --additional-config-path additional_config.json \
-    --max-seq-len-override 16384 \
-    --max-prefill-length 16384 \
+    --memory-ratio 0.2 \
+    --num-pages 10000000 \
+    --max-seq-len-override 131072 \
+    --max-prefill-length 131072 \
     --tp-size 1 \
     --graph 0 \
     --attention-backend fa,fa \
     --max-running-requests 2 \
     --cache-type naive \
     --host "localhost" \
-    --port 6889
+    --port 6888
+
 ```
 
 additional_config.json
@@ -103,9 +107,9 @@ additional_config.json
 ```
 
 #### `shadowkv_config` options:
-   - `min_seqlen_to_prune`: requests won't be pruned to less than min_seqlen_to_prune tokens. Make sure it does not clash with your budgets (`min_seqlen_to_prune` must be less or equal to `max_seq_len * total_budget`)
+   - `min_seqlen_to_prune`: in fractional sparse-budget mode, requests won't be pruned to fewer than this many tokens. Make sure it does not clash with your ratio budgets (`min_seqlen_to_prune` must be less than or equal to `max_seq_len * total_budget`). Absolute sparse budgets take precedence over this setting.
    - `prefix_budget`: proportion of prefix input tokens that is always gathered
-   - `sparse_budget`: proportion of selected tokens
+   - `sparse_budget`: selected sparse budget. A float is a proportion of request tokens (for example, `0.015625`); an integer is an absolute number of chunks selected for every request (for example, `2048`). If fewer chunks are available, all of them are selected.
    - `suffix_budget`: proportion of suffix input tokens that is always gathered
    - `chunk_size`: Landmarks chunk size (YAKV proposes chunk size 1)
    - `quantize_landmarks`: Enable 2-bit HIGGS qunatization of landmarks

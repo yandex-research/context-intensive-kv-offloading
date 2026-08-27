@@ -36,8 +36,7 @@ dependencies = [
     "apache-tvm-ffi>=0.1.4",
     "sgl_kernel>=0.3.17.post1",
     "quack-kernels",
-    "tqdm",
-    "fast-hadamard-transform @ git+https://github.com/Dao-AILab/fast-hadamard-transform.git"
+    "tqdm"
 ]
 
 [project.optional-dependencies]

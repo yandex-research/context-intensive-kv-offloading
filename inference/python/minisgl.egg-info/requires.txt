@@ -3,7 +3,9 @@ msgpack
 modelscope
 torch<2.10.0
 transformers<=4.57.3,>=4.56.0
-flashinfer-python>=0.5.3
+flashinfer-python @ https://github.com/flashinfer-ai/flashinfer/releases/download/nightly-v0.6.18-20260818/flashinfer_python-0.6.18.dev20260818-py3-none-any.whl
+flashinfer-cubin @ https://github.com/flashinfer-ai/flashinfer/releases/download/nightly-v0.6.18-20260818/flashinfer_cubin-0.6.18.dev20260818-py3-none-any.whl
+flashinfer-jit-cache @ https://github.com/flashinfer-ai/flashinfer/releases/download/nightly-v0.6.18-20260818/flashinfer_jit_cache-0.6.18.dev20260818+cu128-cp39-abi3-manylinux_2_28_x86_64.whl
 pyzmq
 uvicorn
 fastapi
@@ -13,7 +15,6 @@ apache-tvm-ffi>=0.1.4
 sgl_kernel>=0.3.17.post1
 quack-kernels
 tqdm
-fast-hadamard-transform@ git+https://github.com/Dao-AILab/fast-hadamard-transform.git
 
 [dev]
 pytest>=6.0

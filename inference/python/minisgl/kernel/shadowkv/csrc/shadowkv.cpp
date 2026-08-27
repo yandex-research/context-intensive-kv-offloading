@@ -2,6 +2,12 @@
 #include <c10/cuda/CUDAStream.h>
 #include <torch/extension.h>
 
+#include <algorithm>
+#include <cstdint>
+#include <functional>
+#include <memory>
+#include <vector>
+
 #include "gather_kv_cache.cuh"
 #include "metadata_kernels.cuh"
 
@@ -114,28 +120,64 @@ torch::Tensor map_to_gpu(torch::Tensor tensor) {
   void* base_ptr = tensor.storage().data_ptr().get();
   size_t size_bytes = tensor.storage().nbytes();
 
-  cudaError_t err =
-      cudaHostRegister(base_ptr, size_bytes, cudaHostRegisterMapped);
+  torch::Tensor* keep_alive = new torch::Tensor(tensor);
+  std::function<void(void*)> deleter;
 
-  bool needs_unregister = false;
-  if (err == cudaSuccess) {
-    needs_unregister = true;
-  } else if (err == cudaErrorHostMemoryAlreadyRegistered) {
-    cudaGetLastError();
+  if (tensor.is_pinned()) {
+    // Memory was allocated with cudaHostAlloc (torch pin_memory=True): it is
+    // already page-locked and, with UVA, directly accessible from the device.
+    // No cudaHostRegister needed.
+    deleter = [keep_alive](void* /*ptr*/) { delete keep_alive; };
   } else {
-    TORCH_CHECK(false, "cudaHostRegister: ", cudaGetErrorString(err));
+    // Register the range in page-aligned chunks instead of one giant range.
+    // Registering many GiB at once forces the NVIDIA driver to allocate large
+    // *physically contiguous* kernel arrays for the DMA mapping (order-10
+    // kzalloc for multi-GiB ranges), which sporadically fails with
+    // cudaErrorInvalidValue ("invalid argument") on hosts with fragmented
+    // physical memory. Small chunks only need small kernel allocations.
+    constexpr uintptr_t kPageSize = 4096;
+    constexpr uintptr_t kChunkBytes = uintptr_t(64) << 20;  // 64 MiB
+    static_assert(kChunkBytes % kPageSize == 0);
+
+    const uintptr_t begin =
+        reinterpret_cast<uintptr_t>(base_ptr) & ~(kPageSize - 1);
+    const uintptr_t end =
+        (reinterpret_cast<uintptr_t>(base_ptr) + size_bytes + kPageSize - 1) &
+        ~(kPageSize - 1);
+
+    auto registered = std::make_shared<std::vector<void*>>();
+    auto unregister_all = [](std::vector<void*>& chunks) {
+      for (void* ptr : chunks) {
+        cudaHostUnregister(ptr);
+      }
+      chunks.clear();
+    };
+
+    for (uintptr_t cur = begin; cur < end; cur += kChunkBytes) {
+      const size_t chunk_size =
+          std::min<uintptr_t>(kChunkBytes, end - cur);
+      cudaError_t err = cudaHostRegister(reinterpret_cast<void*>(cur),
+                                         chunk_size, cudaHostRegisterMapped);
+      if (err == cudaErrorHostMemoryAlreadyRegistered) {
+        (void)cudaGetLastError();
+        continue;
+      }
+      if (err != cudaSuccess) {
+        (void)cudaGetLastError();
+        unregister_all(*registered);
+        delete keep_alive;
+        TORCH_CHECK(false, "cudaHostRegister: ", cudaGetErrorString(err));
+      }
+      registered->push_back(reinterpret_cast<void*>(cur));
+    }
+
+    deleter = [keep_alive, registered, unregister_all](void* /*ptr*/) {
+      unregister_all(*registered);
+      delete keep_alive;
+    };
   }
 
   void* data_ptr = tensor.data_ptr();
-
-  torch::Tensor* keep_alive = new torch::Tensor(tensor);
-
-  auto deleter = [keep_alive, base_ptr, needs_unregister](void* /*ptr*/) {
-    if (needs_unregister) {
-      cudaHostUnregister(base_ptr);
-    }
-    delete keep_alive;
-  };
 
   auto options = torch::TensorOptions()
                      .dtype(tensor.dtype())

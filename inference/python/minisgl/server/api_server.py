@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import asyncio
 import json
-import sys
 import time
 from contextlib import asynccontextmanager
 from dataclasses import dataclass, field
@@ -281,10 +280,37 @@ async def v1_completions(req: OpenAICompletionRequest, request: Request):
         )
     )
 
-    return StreamingResponse(
-        state.stream_with_cancellation(state.stream_chat_completions(uid), request, uid),
-        media_type="text/event-stream",
-    )
+    if req.stream:
+        return StreamingResponse(
+            state.stream_with_cancellation(state.stream_chat_completions(uid), request, uid),
+            media_type="text/event-stream",
+        )
+
+    # Non-streaming: collect all chunks and return a single JSON response
+    full_content = ""
+    async for ack in state.wait_for_ack(uid):
+        full_content += ack.incremental_output
+        if ack.finished:
+            break
+
+    return {
+        "id": f"chatcmpl-{uid}",
+        "object": "chat.completion",
+        "created": int(time.time()),
+        "model": req.model,
+        "choices": [
+            {
+                "index": 0,
+                "message": {"role": "assistant", "content": full_content},
+                "finish_reason": "stop",
+            }
+        ],
+        "usage": {
+            "prompt_tokens": 0,
+            "completion_tokens": 0,
+            "total_tokens": 0,
+        },
+    }
 
 
 @app.get("/v1/models")
@@ -324,21 +350,6 @@ async def shell_completion(req: OpenAICompletionRequest):
     )
 
 
-async def read_stdin():
-    loop = asyncio.get_running_loop()
-    reader = asyncio.StreamReader()
-    protocol = asyncio.StreamReaderProtocol(reader)
-    await loop.connect_read_pipe(lambda: protocol, sys.stdin)
-
-    while True:
-        line = await reader.readline()
-        line = line.decode().rstrip("\n")
-
-
-async def async_input(prompt=""):
-    loop = asyncio.get_running_loop()
-    return await loop.run_in_executor(None, lambda: input(prompt))
-
 
 async def shell():
     commands = ["/exit", "/reset"]
@@ -348,7 +359,6 @@ async def shell():
     try:
         history: List[Tuple[str, str]] = []
         while True:
-            need_stop = False
             cmd = (await session.prompt_async()).strip()
             if cmd == "":
                 continue
@@ -375,8 +385,6 @@ async def shell():
             )
             cur_msg = ""
             async for chunk in (await shell_completion(req)).body_iterator:
-                if need_stop:
-                    break
                 msg = chunk.decode()  # type: ignore
                 assert msg.startswith("data: "), msg
                 msg = msg[6:]

@@ -11,7 +11,7 @@ from .mp import (
     ZmqSubQueue,
 )
 from .registry import Registry
-from .torch_utils import nvtx_annotate, torch_dtype
+from .torch_utils import nvtx_annotate, torch_dtype, get_tensor_capacity, print_object_cuda_tensors_capacity
 
 __all__ = [
     "cached_load_hf_config",
@@ -30,6 +30,8 @@ __all__ = [
     "Unset",
     "torch_dtype",
     "nvtx_annotate",
+    "get_tensor_capacity",
+    "print_object_cuda_tensors_capacity",
     "Registry",
     "ZmqPushQueue",
     "ZmqPullQueue",

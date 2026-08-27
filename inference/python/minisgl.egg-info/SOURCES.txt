@@ -16,7 +16,6 @@ python/minisgl/attention/base.py
 python/minisgl/attention/fa.py
 python/minisgl/attention/fi.py
 python/minisgl/attention/shadowkv.py
-python/minisgl/attention/tmp.py
 python/minisgl/attention/trtllm.py
 python/minisgl/attention/utils.py
 python/minisgl/benchmark/client.py
@@ -49,13 +48,18 @@ python/minisgl/kernel/csrc/src/pynccl.cu
 python/minisgl/kernel/csrc/src/radix.cpp
 python/minisgl/kernel/csrc/src/tensor.cpp
 python/minisgl/kernel/higgs/csrc/higgs_dequantization_full.cu
+python/minisgl/kernel/higgs/csrc/higgs_dequantize_heads.cu
 python/minisgl/kernel/higgs/csrc/higgs_quantization_cuda.cu
+python/minisgl/kernel/higgs/csrc/higgs_quantize_heads.cu
 python/minisgl/kernel/higgs/csrc/higgs_quantizer.cpp
 python/minisgl/kernel/higgs/csrc/higgs_quantizer.h
 python/minisgl/kernel/higgs/csrc/higgs_quantizer_cuda.cu
+python/minisgl/kernel/higgs/csrc/higgs_score.cu
 python/minisgl/kernel/shadowkv/__init__.py
 python/minisgl/kernel/shadowkv/shadowkv_gather_kv_cache.py
+python/minisgl/kernel/shadowkv/shadowkv_gather_scales.py
 python/minisgl/kernel/shadowkv/shadowkv_score_landmarks.py
+python/minisgl/kernel/shadowkv/shadowkv_topk.py
 python/minisgl/kernel/shadowkv/csrc/gather_kv_cache.cu
 python/minisgl/kernel/shadowkv/csrc/gather_kv_cache.cuh
 python/minisgl/kernel/shadowkv/csrc/lib.cpp
@@ -100,6 +104,7 @@ python/minisgl/moe/base.py
 python/minisgl/moe/fused.py
 python/minisgl/quantization/__init__.py
 python/minisgl/quantization/higgs.py
+python/minisgl/quantization/grids/EDEN2-256.pt
 python/minisgl/quantization/grids/EDEN4-256.pt
 python/minisgl/scheduler/__init__.py
 python/minisgl/scheduler/cache.py

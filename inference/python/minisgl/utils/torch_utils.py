@@ -4,8 +4,7 @@ import functools
 from contextlib import contextmanager
 from typing import TYPE_CHECKING
 
-if TYPE_CHECKING:
-    import torch
+import torch
 
 
 @contextmanager
@@ -41,9 +40,7 @@ def get_tensor_capacity(x: torch.Tensor, base: int = 2**30) -> float:
     return x.numel() * x.element_size() / base
 
 
-def print_object_cuda_tensors_capacity(obj) -> None:
-    import torch
-
+def print_object_cuda_tensors_capacity(obj) -> str:
     res = 0.0
     out = []
     for name in obj.__dict__:

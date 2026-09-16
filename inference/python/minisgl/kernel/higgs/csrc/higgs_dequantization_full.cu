@@ -40,38 +40,9 @@ struct higgs_dequantize_d4_n256_full_kernel_traits {
 };
 
 
-__forceinline__ __device__ void hadamard_thread(float dequantized[8]) {
-    #pragma unroll
-    for (int i = 0; i < 3; ++i) {
-        const int stride = 1 << i;
-        #pragma unroll
-        for (int j = 0; j < 4; ++j) {
-            const int lo = j & (stride - 1);
-            const int idx = (j - lo) * 2 + lo;
-            #pragma unroll
-            const float a = dequantized[idx];
-            const float b = dequantized[idx + stride];
-            dequantized[idx] = a + b;
-            dequantized[idx + stride] = a - b;
-        }
-    }
-}
+// hadamard_thread now lives in higgs_quantizer.h as a template (N deduced from the array).
 
-template<int kLogNThreadsPerChannelInWarp> // 16 for channel_size = 128 in Qwen2.5-0.5B, 32 for everything else
-__forceinline__ __device__ void hadamard_warp(float dequantized[8]) {
-    constexpr int N = 1 << kLogNThreadsPerChannelInWarp;
-    int lane_id = threadIdx.x % N;
-    #pragma unroll
-    for (int step = 0; step < kLogNThreadsPerChannelInWarp; ++step) {
-        const int lane_mask = 1 << step;
-        const float sign = (lane_id & lane_mask) ? -1.f : 1.f;
-        #pragma unroll
-        for (int i = 0; i < 8; ++i) {
-            float x_val_other = __shfl_xor_sync(__activemask(), dequantized[i], lane_mask);        
-            dequantized[i] = sign * dequantized[i] + x_val_other;
-        }
-    }
-}
+// hadamard_warp now lives in higgs_quantizer.h as a template (kNElems deduced from the array).
 
 template<int kNThreadsPerChannel, int kNWarpsPerChannel, bool Pre>
 inline __device__ void exchange(float dequantized[8], float2 *smem) {
@@ -214,14 +185,14 @@ void higgs_dequantize_d4_n256_full_kernel(DequantizeFullParams params, int n_ite
                 int flatten_batch_row_index = row_threadBlock_level + output_row_index;
                 int64_t add_shift = flatten_batch_row_index * traits::kChannelSize * 2 / 16 + threadIdx.x % kLookUpNThreadsPerRow; // sizeof(bfloat16) = 2
                 int64_t output_shift = (flatten_batch_row_index / params.n_tokens * params.out_batch_stride + flatten_batch_row_index % params.n_tokens * params.out_token_stride) / 16 + threadIdx.x % kLookUpNThreadsPerRow;
-                // __align__(16) __nv_bfloat16 add_values[8];
-                // auto add_load = reinterpret_cast<float4*>(params.add_ptr);
-                // *reinterpret_cast<float4*>(add_values) = add_load[add_shift];
+                __align__(16) __nv_bfloat16 add_values[8];
+                auto add_load = reinterpret_cast<float4*>(params.add_ptr);
+                *reinterpret_cast<float4*>(add_values) = add_load[add_shift];
                 
-                // #pragma unroll
-                // for (int k = 0; k < 8; ++k) {
-                //     dequantized[k] += float(add_values[k]);
-                // }
+                #pragma unroll
+                for (int k = 0; k < 8; ++k) {
+                    dequantized[k] += float(add_values[k]);
+                }
 
                 #pragma unroll
                 for (int k = 0; k < 4; ++k) {

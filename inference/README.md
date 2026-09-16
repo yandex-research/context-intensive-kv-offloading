@@ -5,13 +5,12 @@
    - page_size == 1
    - no cuda graph
    - `--cache-type` naive
-   - Model `head-dim` 128
 
 ## Installation:
 
 Install from source:
 ```bash
-pip install . --no-build-isolation
+COMPUTE_CAP=90 pip install . --no-build-isolation
 ```
 
 **Note** that the installation requires flash-attn. Building it from source can take up significant time and memory. Consider using pre-built wheels or images.
@@ -34,7 +33,7 @@ python3 -m minisgl \
     --tp-size 1 \
     --graph 0 \
     --attention-backend fa,fa \
-    --max-running-requests 2 \
+    --max-running-requests 16 \
     --cache-type naive \
     --host "localhost" \
     --port 6888
@@ -50,25 +49,23 @@ additional_config.json
       "prefix_budget": 0.00625,
       "sparse_budget": 0.015625,
       "suffix_budget": 0.00625,
-      "chunk_size": 1,
+      "chunk_size": 2,
       "quantize_landmarks": true,
+      "quantize_kvcache": true,
       "enable_offloading": true,
-      "landmarks_dtype": "bf16",
-      "kv_cache_dtype": "fp8"
    }
 }
 ```
 
 #### `shadowkv_config` options:
-   - `min_seqlen_to_prune`: requests won't be pruned to less than min_seqlen_to_prune tokens. Make sure it does not clash with your budgets (`min_seqlen_to_prune` must be less or equal to `max_seq_len * total_budget`)
-   - `prefix_budget`: proportion of prefix input tokens that is always gathered
-   - `sparse_budget`: proportion of selected tokens
-   - `suffix_budget`: proportion of suffix input tokens that is always gathered
-   - `chunk_size`: Landmarks chunk size (YAKV proposes chunk size 1)
+   - `min_seqlen_to_prune`: Requests won't be pruned to less than min_seqlen_to_prune tokens. Make sure it does not clash with your budgets (`min_seqlen_to_prune` must be less or equal to `max_seq_len * total_budget`)
+   - `prefix_budget`: Proportion of prefix input tokens that is always gathered
+   - `sparse_budget`: Proportion of selected tokens
+   - `suffix_budget`: Proportion of suffix input tokens that is always gathered
+   - `chunk_size`: Landmarks chunk size (YAKV proposes chunk size 2)
    - `quantize_landmarks`: Enable 2-bit HIGGS qunatization of landmarks
-   - `enable_offloading`: weather to offload KV-cache to CPU
-   - `landmarks_dtype`: Allowed values `[bf16, fp8]`. If `quantize_landmarks == false` landmarks will be stored in selected dtype
-   - `kv_cache_dtype`: Allowed values `[bf16, fp8]`
+   - `quantize_kvcache`: Enable 4-bit HIGGS qunatization of KV-cache
+   - `enable_offloading`: Whether to offload KV-cache to CPU
 
 
 
